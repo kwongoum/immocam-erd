@@ -1,0 +1,44 @@
+CREATE TABLE Applies (user_id bigint(20) NOT NULL, realty_id bigint(20) NOT NULL, CONSTRAINT id PRIMARY KEY (user_id, realty_id));
+CREATE TABLE Countries (id bigint(20) NOT NULL AUTO_INCREMENT, code varchar(20) NOT NULL UNIQUE, phone_code varchar(20) NOT NULL, alpha2 varchar(20) NOT NULL, alpha3 varchar(20) NOT NULL, name_en varchar(255) NOT NULL, name_fr varchar(255), delete_integrity tinyint DEFAULT 0 NOT NULL, created_at datetime NOT NULL, updated_at datetime NULL, CONSTRAINT id PRIMARY KEY (id));
+CREATE TABLE Groupes (id bigint(20) NOT NULL AUTO_INCREMENT, roles_id bigint(20), name_en varchar(100) NOT NULL, name_fr varchar(100), CONSTRAINT id PRIMARY KEY (id));
+CREATE TABLE Groups_Users (group_id bigint(20) NOT NULL, user_id bigint(20) NOT NULL, PRIMARY KEY (group_id, user_id));
+CREATE TABLE Langues (id bigint(20) NOT NULL AUTO_INCREMENT, code varchar(10) NOT NULL, country varchar(255) NOT NULL, description text, created_at datetime NOT NULL, CONSTRAINT id PRIMARY KEY (id));
+CREATE TABLE Media_types (id bigint(20) NOT NULL AUTO_INCREMENT, name varchar(160) NOT NULL, description text, created_at datetime NOT NULL, PRIMARY KEY (id));
+CREATE TABLE Medias (id bigint(20) NOT NULL AUTO_INCREMENT, user_id bigint(20) NOT NULL, realty_id bigint(20), media_type_id bigint(20) NOT NULL, name varchar(255) NOT NULL, link varchar(255) NOT NULL, type varchar(10) NOT NULL, `size` varchar(255) NOT NULL, delete_integrity tinyint DEFAULT 0 NOT NULL, created_at datetime NOT NULL, PRIMARY KEY (id));
+CREATE TABLE Password_resets (id bigint(20) NOT NULL AUTO_INCREMENT, email varchar(255) NOT NULL, token varchar(255) NOT NULL, created_at datetime NOT NULL, PRIMARY KEY (id));
+CREATE TABLE Permissions (id bigint(20) NOT NULL AUTO_INCREMENT, name_en varchar(100) NOT NULL, name_fr varchar(100), CONSTRAINT id PRIMARY KEY (id));
+CREATE TABLE Permissions_Roles (permission_id bigint(20) NOT NULL, role_id bigint(20) NOT NULL, PRIMARY KEY (permission_id, role_id));
+CREATE TABLE Realties (id bigint(20) NOT NULL AUTO_INCREMENT, user_id bigint(20) NOT NULL, realty_category_id bigint(20) NOT NULL, town_id bigint(20) NOT NULL, description text, price double NOT NULL, quantity int(15) DEFAULT 1, applies_number int(20), type varchar(100) NOT NULL, status tinyint DEFAULT 1 NOT NULL comment '0 = blocked
+1 = available
+2 = sold', delete_integrity tinyint DEFAULT 0 NOT NULL, created_at datetime NOT NULL, updated_at datetime NULL, PRIMARY KEY (id));
+CREATE TABLE Realty_categories (id bigint(20) NOT NULL AUTO_INCREMENT, name varchar(160) NOT NULL, description text, created_at datetime NOT NULL, CONSTRAINT id PRIMARY KEY (id));
+CREATE TABLE Roles (id bigint(20) NOT NULL AUTO_INCREMENT, name_en varchar(100) NOT NULL, name_fr varchar(100), CONSTRAINT id PRIMARY KEY (id));
+CREATE TABLE Roles_Users (role_id bigint(20) NOT NULL, user_id bigint(20) NOT NULL, PRIMARY KEY (role_id, user_id));
+CREATE TABLE Subscription_histories (id bigint(20) NOT NULL AUTO_INCREMENT, subscription_id bigint(20) NOT NULL, user_id bigint(20) NOT NULL, start_date datetime NOT NULL, end_date datetime NOT NULL, created_at datetime NOT NULL, PRIMARY KEY (id));
+CREATE TABLE Subscriptions (id bigint(20) NOT NULL AUTO_INCREMENT, name varchar(160) NOT NULL, weekly_price double NOT NULL, monthly_price double NOT NULL, three_monthly_price double NOT NULL, yearly_price double NOT NULL, description text, created_at datetime NOT NULL, CONSTRAINT id PRIMARY KEY (id));
+CREATE TABLE Subscriptions_Users (subscription_id bigint(20) NOT NULL, user_id bigint(20) NOT NULL, start_date datetime NOT NULL, end_date datetime NOT NULL, status tinyint DEFAULT 1 NOT NULL, delete_integrity tinyint DEFAULT 0 NOT NULL, created_at datetime NOT NULL, updated_at datetime NULL, PRIMARY KEY (subscription_id, user_id));
+CREATE TABLE Towns (id bigint(20) NOT NULL AUTO_INCREMENT, country_id bigint(20) NOT NULL, code varchar(20) NOT NULL UNIQUE, name varchar(255) NOT NULL, delete_integrity tinyint DEFAULT 0 NOT NULL, created_at datetime NOT NULL, updated_at datetime NULL, CONSTRAINT id PRIMARY KEY (id));
+CREATE TABLE Users (id bigint(20) NOT NULL AUTO_INCREMENT, country_id bigint(20), language_id bigint(20) NOT NULL, town_id bigint(20), first_name varchar(255) NOT NULL, last_name varchar(255) NOT NULL, username varchar(255) NOT NULL UNIQUE, email varchar(255) NOT NULL UNIQUE, phone bigint(20) NOT NULL UNIQUE, password varchar(255) NOT NULL, birthday date, gender varchar(1), about text, address varchar(255), status tinyint DEFAULT 1 NOT NULL, delete_integrity tinyint DEFAULT 0 NOT NULL, confirmation_token varchar(100), confirmed_at datetime NULL, remember_token varchar(100), created_at datetime NOT NULL, CONSTRAINT id PRIMARY KEY (id));
+ALTER TABLE Towns ADD CONSTRAINT FKTowns812222 FOREIGN KEY (country_id) REFERENCES Countries (id) ON UPDATE Restrict ON DELETE Restrict;
+ALTER TABLE Users ADD CONSTRAINT FKUsers786710 FOREIGN KEY (country_id) REFERENCES Countries (id) ON UPDATE Restrict ON DELETE Restrict;
+ALTER TABLE Users ADD CONSTRAINT FKUsers620189 FOREIGN KEY (town_id) REFERENCES Towns (id) ON UPDATE Restrict ON DELETE Restrict;
+ALTER TABLE Users ADD CONSTRAINT FKUsers784896 FOREIGN KEY (language_id) REFERENCES Langues (id) ON UPDATE Restrict ON DELETE Restrict;
+ALTER TABLE Groupes ADD CONSTRAINT FKGroupes550669 FOREIGN KEY (roles_id) REFERENCES Roles (id) ON UPDATE Restrict ON DELETE Restrict;
+ALTER TABLE Medias ADD CONSTRAINT FKMedias724139 FOREIGN KEY (media_type_id) REFERENCES Media_types (id) ON UPDATE Restrict ON DELETE Restrict;
+ALTER TABLE Medias ADD CONSTRAINT FKMedias269578 FOREIGN KEY (user_id) REFERENCES Users (id) ON UPDATE Restrict ON DELETE Restrict;
+ALTER TABLE Realties ADD CONSTRAINT FKRealties658664 FOREIGN KEY (user_id) REFERENCES Users (id) ON UPDATE Restrict ON DELETE Restrict;
+ALTER TABLE Medias ADD CONSTRAINT FKMedias379235 FOREIGN KEY (realty_id) REFERENCES Realties (id) ON UPDATE Restrict ON DELETE Restrict;
+ALTER TABLE Applies ADD CONSTRAINT FKApplies315172 FOREIGN KEY (user_id) REFERENCES Users (id) ON UPDATE Restrict ON DELETE Restrict;
+ALTER TABLE Applies ADD CONSTRAINT FKApplies7605 FOREIGN KEY (realty_id) REFERENCES Realties (id) ON UPDATE Restrict ON DELETE Restrict;
+ALTER TABLE Realties ADD CONSTRAINT FKRealties502181 FOREIGN KEY (realty_category_id) REFERENCES Realty_categories (id) ON UPDATE Restrict ON DELETE Restrict;
+ALTER TABLE Permissions_Roles ADD CONSTRAINT FKPermission159909 FOREIGN KEY (permission_id) REFERENCES Permissions (id);
+ALTER TABLE Permissions_Roles ADD CONSTRAINT FKPermission467373 FOREIGN KEY (role_id) REFERENCES Roles (id);
+ALTER TABLE Roles_Users ADD CONSTRAINT FKRoles_User121825 FOREIGN KEY (role_id) REFERENCES Roles (id);
+ALTER TABLE Roles_Users ADD CONSTRAINT FKRoles_User256956 FOREIGN KEY (user_id) REFERENCES Users (id);
+ALTER TABLE Groups_Users ADD CONSTRAINT FKGroups_Use779974 FOREIGN KEY (group_id) REFERENCES Groupes (id);
+ALTER TABLE Groups_Users ADD CONSTRAINT FKGroups_Use361810 FOREIGN KEY (user_id) REFERENCES Users (id);
+ALTER TABLE Subscriptions_Users ADD CONSTRAINT FKSubscripti728108 FOREIGN KEY (subscription_id) REFERENCES Subscriptions (id);
+ALTER TABLE Subscriptions_Users ADD CONSTRAINT FKSubscripti907668 FOREIGN KEY (user_id) REFERENCES Users (id);
+ALTER TABLE Subscription_histories ADD CONSTRAINT FKSubscripti796201 FOREIGN KEY (subscription_id, user_id) REFERENCES Subscriptions_Users (subscription_id, user_id) ON UPDATE Restrict ON DELETE Restrict;
+ALTER TABLE Realties ADD CONSTRAINT FKRealties201233 FOREIGN KEY (town_id) REFERENCES Towns (id);
+
